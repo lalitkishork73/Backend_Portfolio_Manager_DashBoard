@@ -1,0 +1,28 @@
+{
+  "name": "portfolio_manager",
+  "version": "1.0.0",
+  "description": "This Is PortFolio Backend app",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "client": "cd client && npm start",
+    "server": "cd server && npm start ",
+    "start": "concurrently \"npm run client\" \"npm run server\"",
+    "inserver": "cd server && npm i",
+    "inclient": "cd client && npm i",
+    "depi": "concurrently \"npm run inserver\" \"npm run inclient\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lalitkishork73/Backend_Portfolio_Manager_DashBoard.git"
+  },
+  "author": "Lalitkishor k",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lalitkishork73/Backend_Portfolio_Manager_DashBoard/issues"
+  },
+  "homepage": "https://github.com/lalitkishork73/Backend_Portfolio_Manager_DashBoard#readme",
+  "dependencies": {
+    "concurrently": "^7.6.0"
+  }
+}
