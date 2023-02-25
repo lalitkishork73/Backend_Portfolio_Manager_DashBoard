@@ -5,6 +5,8 @@ import { config } from './configs/config';
 import User from './routes/User';
 import Project from './routes/Project';
 const app: Application = express();
+import dotenv from 'dotenv';
+dotenv.config();
 
 /*connect Mongoose*/
 

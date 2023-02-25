@@ -6,7 +6,7 @@ export interface Project {
     description: string;
     viewCode: string;
     visitSite: string;
-    user:string;
+    user: string;
 }
 
 export interface ProjectModel extends Project, Document {}
@@ -18,7 +18,8 @@ const ProjectSchema = new Schema(
         description: { type: 'String', required: true },
         viewCode: { type: 'String', required: true },
         visitSite: { type: 'String', required: true },
-        user: { type: Schema.Types.ObjectId, required: true, ref: 'User' }
+        user: { type: Schema.Types.ObjectId, required: true, ref: 'User' },
+        isDeleted: { type: 'Boolean', default: false }
     },
     {
         versionKey: false
