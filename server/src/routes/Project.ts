@@ -1,11 +1,12 @@
 import express from 'express';
 const router = express.Router();
 import controller from '../controllers/Project';
-// import { Schemas, ValidateJoi } from '../middleware/Joi';
+import { Schemas, ValidateJoi } from '../middlewares/Joi';
+import Auth from '../middlewares/Auth';
 
-router.post('/createproject',controller.CreateProject);
-router.get('/getproject',controller.GetProject);
-router.put('/updateproject',controller.UpdateProject);
-router.delete('/deleteproject',controller.DeleteProject);
+router.post('/createproject', Auth.Authentication, ValidateJoi(Schemas.project.create), controller.CreateProject);
+router.get('/getproject', Auth.Authentication, controller.GetProject);
+router.patch('/updateproject/:id', Auth.Authentication, Auth.Authorization, ValidateJoi(Schemas.project.update), controller.UpdateProject);
+router.delete('/deleteproject/:id', Auth.Authentication, Auth.Authorization, controller.DeleteProject);
 
 export = router;
