@@ -16,20 +16,26 @@ declare global {
 
 const Authentication = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const tokenWithBearer = req.headers['authorization'];
+        let tokenWithBearer = req.headers['authorization'];
+
         if (!tokenWithBearer) {
             return res.status(400).send({ status: false, message: 'token is required' });
         }
-        if (tokenWithBearer) {
-            return jwt.verify(tokenWithBearer, process.env.SECRET_KEY as string, (err: any, decoded: any) => {
-                if (err) {
-                    return res.status(401).send({ status: false, message: 'unauthorized' });
-                }
-                req.user = decoded.userId;
-                return next();
-            });
+        let tokenArray = tokenWithBearer.split(' ');
+        let token = tokenArray[1];
+
+        if (!token) {
+            return res.status(404).send({ status: false, message: 'Invalid Token' });
         }
-        return res.status(401).send({ status: false, message: 'unauthorized' });
+
+        jwt.verify(token, process.env.SECRET_KEY as string, (err: any, decode: any) => {
+            if (err) {
+                return res.status(401).send({ status: false, message: err.message });
+            } else {
+                req['user'] = decode.userId;
+                next();
+            }
+        });
     } catch (error: any) {
         return res.status(500).json({ message: error });
     }
@@ -37,9 +43,9 @@ const Authentication = async (req: Request, res: Response, next: NextFunction) =
 const Authorization = async (req: Request, res: Response, next: NextFunction) => {
     try {
         let tokenId = req.user;
-        let userId = req.params.Id || req.query.Id;
+        let userId = req.params.id;
 
-        const findUserId: any = await ProjectModel.findById({ userId });
+        const findUserId: any = await ProjectModel.findOne({ _id: userId });
         if (!findUserId) return res.status(404).send({ status: false, message: 'User not found' });
 
         const { user } = findUserId;
