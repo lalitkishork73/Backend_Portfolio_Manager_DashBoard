@@ -8,8 +8,8 @@ import { useSignIn } from 'react-auth-kit';
 import { useNavigate, Navigate } from 'react-router-dom';
 
 interface FormValues {
-    username: string;
-    password: string;
+    username?: string;
+    password?: string;
 }
 
 interface FormErrors {

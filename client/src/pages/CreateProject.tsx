@@ -5,6 +5,8 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { blue, green } from '@mui/material/colors';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
+import axios from '../utils/axios';
+import { useCookies } from 'react-cookie';
 
 const theme = createTheme({
     palette: {
@@ -14,11 +16,11 @@ const theme = createTheme({
 });
 
 interface FormValues {
-    projectName: string;
-    description: string;
-    videoLink: string;
-    viewCode: string;
-    visitSite: string;
+    projectName?: string;
+    description?: string;
+    videoLink?: string;
+    viewCode?: string;
+    visitSite?: string;
 }
 
 const initialValues: FormValues = {
@@ -39,16 +41,33 @@ const validationSchema = Yup.object({
 
 const CreateProject = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [token] = useCookies(['_auth', '_auth_state']);
 
     const formik = useFormik({
         initialValues,
         validationSchema,
-        onSubmit: async (values) => {
+        onSubmit: async (values: FormValues) => {
             setIsSubmitting(true);
+            // formik.setFieldValue('user', token._auth_state.id); /*  */
             console.log(values);
+
+            // console.log(values);
+            createProject(values);
+
             setIsSubmitting(false);
         }
     });
+    // formik.values.viewCode= token._auth_state.id
+    const createProject = async (values: FormValues) => {
+        try {
+            console.log(values);
+            const response = await axios.post(`project/createproject/${token._auth_state.id}`, values, {
+                headers: { Authorization: `Bearer ${token._auth}` }
+            });
+        } catch (err: any) {
+            console.log(err);
+        }
+    };
 
     return (
         <>
@@ -80,12 +99,12 @@ const CreateProject = () => {
                         </FormControl>
                         <FormControl fullWidth sx={{ mb: 3 }}>
                             <InputLabel htmlFor="viewCode">View Code</InputLabel>
-                            <Input id="videoCode" name="videoCode" value={formik.values.viewCode} onChange={formik.handleChange} onBlur={formik.handleBlur} />
+                            <Input id="viewCode" name="viewCode" value={formik.values.viewCode} onChange={formik.handleChange} onBlur={formik.handleBlur} />
                             {formik.touched.viewCode && formik.errors.viewCode ? <FormHelperText error>{formik.errors.viewCode}</FormHelperText> : null}
                         </FormControl>
                         <FormControl fullWidth sx={{ mb: 3 }}>
                             <InputLabel htmlFor="visitSite">visitSite</InputLabel>
-                            <Input id="videoCode" name="videoCode" value={formik.values.visitSite} onChange={formik.handleChange} onBlur={formik.handleBlur} />
+                            <Input id="visitSite" name="visitSite" value={formik.values.visitSite} onChange={formik.handleChange} onBlur={formik.handleBlur} />
                             {formik.touched.visitSite && formik.errors.visitSite ? <FormHelperText error>{formik.errors.visitSite}</FormHelperText> : null}
                         </FormControl>
                         <Button type="submit" variant="outlined">

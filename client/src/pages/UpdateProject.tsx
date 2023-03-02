@@ -1,77 +1,87 @@
-import * as React from 'react';
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
+import axios from '../utils/axios';
+import { useCookies } from 'react-cookie';
 import {
     Box,
-    Button,
-    IconButton,
-    Table,
-    TableBody,
-    TableCell,
+    Typography,
     TableContainer,
+    Table,
     TableHead,
     TableRow,
-    Typography,
-    TextField,
+    TableCell,
+    TableBody,
+    IconButton,
     Dialog,
     DialogTitle,
     DialogContent,
     DialogActions,
-    CircularProgress
+    TextField,
+    Button,
+    createTheme,
+    ThemeProvider
 } from '@mui/material';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { blue, red } from '@mui/material/colors';
-import { Delete, Edit } from '@mui/icons-material';
-import axios from '../utils/axios';
-import { useCookies } from 'react-cookie';
-import { Formik, Form, Field } from 'formik';
-import * as yup from 'yup';
+import { Edit, Delete } from '@mui/icons-material';
+
+interface Project {
+    projectName?: string;
+    description?: string;
+    videoLink?: string;
+    viewCode?: string;
+    visitSite?: string;
+}
 
 const theme = createTheme({
     palette: {
-        primary: blue,
-        secondary: red
+        primary: {
+            main: '#2196f3'
+        },
+        secondary: {
+            main: '#f44336'
+        }
     }
 });
 
-interface Project {
-    id: number;
-    projectName: string;
-    description: string;
-    videoLink: string;
-    viewCode: string;
-    visitSite: string;
-}
-
-
 const UpdateProject = () => {
     const [projects, setProjects] = useState<Project[]>([]);
-    const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+    const [selectedProject, setSelectedProject] = useState<Project | null>({
+        projectName: '',
+        description: '',
+        videoLink: '',
+        viewCode: '',
+        visitSite: '' // provide a default value
+    });
     const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
+    const [ids, setIds] = useState<{ ids?: string }>();
 
     useEffect(() => {
+        const fetchProjects = async () => {
+            try {
+                const response = await axios.get('project/getproject', {
+                    headers: { Authorization: `Bearer ${cookies._auth}` }
+                });
+                // console.log(response.data.data);
+                setProjects(response.data.data);
+                // console.log(projects);
+            } catch (err: any) {
+                console.error(err);
+            }
+        };
+
         fetchProjects();
-    }, []);
+    }, [projects]);
 
     const [cookies] = useCookies(['_auth']);
-    // console.log(cookies._auth);
 
     const fetchProjects = async () => {
-        const response = await axios.get('project/getproject', { headers: { Authorization: `Bearer ${cookies._auth}` } });
-        console.log(response.data.data[0].projectName);
+        const response = await axios.get('project/getproject', {
+            headers: { Authorization: `Bearer ${cookies._auth}` }
+        });
+        // console.log(response.data.data);
         setProjects(response.data.data);
-        console.log(projects[0].projectName);
     };
 
-    const updateValidationSchema = yup.object().shape({
-        projectName: yup.string().required('Required'),
-        description: yup.string().required('Required'),
-        viewCode: yup.string().url('Must be a valid URL'),
-        videoLink: yup.string().url('Must be a valid URL')
-    });
-
-    const handleEdit = (projectId: number) => {
-        const project = projects.find((p) => p.id === projectId);
-        setSelectedProject(project ?? null);
+    const handleEdit = (projectId: any) => {
+        setIds(projectId);
         setIsUpdateDialogOpen(true);
     };
 
@@ -82,17 +92,23 @@ const UpdateProject = () => {
 
     const handleUpdate = async (values: Project) => {
         try {
-            await axios.put(`http://localhost:3000/projects/${selectedProject?.id}`, values);
+            // console.log(values);
+            const response = await axios.patch(`project/updateproject/${ids}`, values, {
+                headers: { Authorization: `Bearer ${cookies._auth}` }
+            });
+
+            console.log(response);
             handleCloseUpdateDialog();
             fetchProjects();
         } catch (error) {
             console.error(error);
-            // handle error here
         }
     };
 
-    const handleDelete = async (projectId: number) => {
-        await axios.delete(`http://localhost:3000/projects/${projectId}`);
+    const handleDelete = async (projectId: any) => {
+        await axios.delete(`project/deleteproject/${projectId}`, {
+            headers: { Authorization: `Bearer ${cookies._auth}` }
+        });
         fetchProjects();
     };
 
@@ -113,16 +129,26 @@ const UpdateProject = () => {
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {projects.map((project) => (
-                                    <TableRow key={project.id}>
+                                {projects.map((project: any) => (
+                                    <TableRow key={project._id}>
                                         <TableCell>{project.projectName}</TableCell>
                                         <TableCell>
-                                            <IconButton color="primary" onClick={() => handleEdit(project.id)}>
+                                            <IconButton
+                                                color="primary"
+                                                onClick={() => {
+                                                    handleEdit(project._id);
+                                                }}
+                                            >
                                                 <Edit />
                                             </IconButton>
                                         </TableCell>
                                         <TableCell>
-                                            <IconButton color="secondary" onClick={() => handleDelete(project.id)}>
+                                            <IconButton
+                                                color="secondary"
+                                                onClick={() => {
+                                                    handleDelete(project._id);
+                                                }}
+                                            >
                                                 <Delete />
                                             </IconButton>
                                         </TableCell>
@@ -133,6 +159,53 @@ const UpdateProject = () => {
                     </TableContainer>
                 </Box>
             </ThemeProvider>
+
+            <Dialog open={isUpdateDialogOpen} onClose={handleCloseUpdateDialog}>
+                <DialogTitle>Update Project</DialogTitle>
+                <DialogContent>
+                    <TextField
+                        fullWidth
+                        label="Project Name"
+                        defaultValue={selectedProject?.projectName}
+                        onChange={(e: any) => setSelectedProject({ ...selectedProject, projectName: e.target.value })}
+                        sx={{ m: 1 }}
+                    />
+                    <TextField
+                        fullWidth
+                        label="Description"
+                        defaultValue={selectedProject?.description}
+                        onChange={(e: any) => setSelectedProject({ ...selectedProject, description: e.target.value })}
+                        sx={{ m: 1 }}
+                    />
+                    <TextField
+                        fullWidth
+                        label="Video Link"
+                        defaultValue={selectedProject?.videoLink}
+                        onChange={(e: any) => setSelectedProject({ ...selectedProject, videoLink: e.target.value })}
+                        sx={{ m: 1 }}
+                    />
+                    <TextField
+                        fullWidth
+                        label="View Code"
+                        defaultValue={selectedProject?.viewCode}
+                        onChange={(e: any) => setSelectedProject({ ...selectedProject, viewCode: e.target.value })}
+                        sx={{ m: 1 }}
+                    />
+                    <TextField
+                        fullWidth
+                        label="Visit Site"
+                        defaultValue={selectedProject?.visitSite}
+                        onChange={(e: any) => setSelectedProject({ ...selectedProject, visitSite: e.target.value })}
+                        sx={{ m: 1 }}
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseUpdateDialog}>Cancel</Button>
+                    <Button variant="contained" color="primary" onClick={() => handleUpdate(selectedProject as Project)}>
+                        Update
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </>
     );
 };
