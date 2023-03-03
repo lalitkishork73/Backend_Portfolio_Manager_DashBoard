@@ -6,6 +6,7 @@ import User from './routes/User';
 import Project from './routes/Project';
 const app: Application = express();
 import dotenv from 'dotenv';
+import path from 'path';
 dotenv.config();
 
 /*connect Mongoose*/
@@ -31,6 +32,7 @@ const StartServer = () => {
         next();
     });
 
+    app.use(express.static(path.join(__dirname, '../../', '/client', '/build')))
     app.use(express.urlencoded({ extended: true }));
     app.use(express.json());
 
@@ -48,6 +50,7 @@ const StartServer = () => {
     });
 
     /* Routes */
+
     app.use('/user', User);
     app.use('/project', Project);
 
