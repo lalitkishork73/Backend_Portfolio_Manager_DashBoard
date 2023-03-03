@@ -43,13 +43,7 @@ const theme = createTheme({
 
 const UpdateProject = () => {
     const [projects, setProjects] = useState<Project[]>([]);
-    const [selectedProject, setSelectedProject] = useState<Project | null>({
-        projectName: '',
-        description: '',
-        videoLink: '',
-        viewCode: '',
-        visitSite: '' // provide a default value
-    });
+    const [selectedProject, setSelectedProject] = useState<Project | null>({});
     const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
     const [ids, setIds] = useState<{ ids?: string }>();
 

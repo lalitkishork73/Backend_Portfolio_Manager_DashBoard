@@ -21,6 +21,7 @@ interface FormValues {
     videoLink?: string;
     viewCode?: string;
     visitSite?: string;
+    user?: string;
 }
 
 const initialValues: FormValues = {
@@ -28,7 +29,8 @@ const initialValues: FormValues = {
     description: '',
     videoLink: '',
     viewCode: '',
-    visitSite: ''
+    visitSite: '',
+    user: ''
 };
 
 const validationSchema = Yup.object({
@@ -51,6 +53,7 @@ const CreateProject = () => {
             // formik.setFieldValue('user', token._auth_state.id); /*  */
             console.log(values);
 
+            values.user = token._auth_state.id;
             // console.log(values);
             createProject(values);
 
@@ -60,8 +63,7 @@ const CreateProject = () => {
     // formik.values.viewCode= token._auth_state.id
     const createProject = async (values: FormValues) => {
         try {
-            console.log(values);
-            const response = await axios.post(`project/createproject/${token._auth_state.id}`, values, {
+            const response = await axios.post(`project/createproject`, values, {
                 headers: { Authorization: `Bearer ${token._auth}` }
             });
         } catch (err: any) {

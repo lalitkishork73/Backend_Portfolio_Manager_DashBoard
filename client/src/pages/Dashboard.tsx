@@ -6,6 +6,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { blue, green } from '@mui/material/colors';
 import UpdateProject from './UpdateProject';
 import CreateProject from './CreateProject';
+import ListProject from './ListProject';
 
 const theme = createTheme({
     palette: {
@@ -32,8 +33,10 @@ const Dashboard = () => {
     const renderConsole = () => {
         if (selectedMenu === 'create') {
             return <CreateProject />;
-        } else {
+        } else if (selectedMenu === 'update') {
             return <UpdateProject />;
+        } else {
+            return <ListProject />;
         }
     };
     return (
@@ -71,13 +74,19 @@ const Dashboard = () => {
                                 </ListItemIcon>
                                 <ListItemText primary="Update Project" />
                             </ListItem>
+                            <ListItem button key="list" selected={selectedMenu === 'list'} onClick={() => handleMenuClick('list')}>
+                                <ListItemIcon>
+                                    <i className="fas fa-edit"></i>
+                                </ListItemIcon>
+                                <ListItemText primary="List Project" />
+                            </ListItem>
                         </List>
                     </Drawer>
                     <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
                         <Toolbar />
                         <Container maxWidth="lg">
                             <Typography variant="h4" sx={{ mb: 4 }}>
-                                {selectedMenu === 'create' ? 'Create Project' : 'Update Project'}
+                                {selectedMenu === 'create' ? 'Create Project' : selectedMenu === 'update' ? 'Update Project' : 'List Project'}
                             </Typography>
                             {renderConsole()}
                         </Container>

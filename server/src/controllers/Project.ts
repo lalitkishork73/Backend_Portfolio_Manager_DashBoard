@@ -6,10 +6,9 @@ import ProjectModel from '../models/ProjectModel';
 
 const CreateProject = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const id=req.params.id;
+
         const data= req.body;   
-        data['user']=id.toString();
-        console.log(data)
+
         const createdProject = await ProjectModel.create(data);
         if (!createdProject) {
             return res.status(400).json({ status: false, message: 'bad Request' });

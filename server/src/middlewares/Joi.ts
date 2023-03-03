@@ -45,7 +45,8 @@ export const Schemas = {
             projectName: Joi.string().required(),
             description: Joi.string().required(),
             viewCode: Joi.string().required(),
-            visitSite: Joi.string().required()
+            visitSite: Joi.string().required(),
+            user: Joi.string().required()
         }),
         update: Joi.object<Project>({
             videoLink: Joi.string(),
