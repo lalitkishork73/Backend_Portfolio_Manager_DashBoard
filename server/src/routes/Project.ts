@@ -5,7 +5,7 @@ import { Schemas, ValidateJoi } from '../middlewares/Joi';
 import Auth from '../middlewares/Auth';
 
 router.post('/createproject', Auth.Authentication, ValidateJoi(Schemas.project.create), controller.CreateProject);
-router.get('/getproject', Auth.Authentication, controller.GetProject);
+router.get('/getproject', controller.GetProject);
 router.patch('/updateproject/:id', Auth.Authentication, Auth.Authorization, ValidateJoi(Schemas.project.update), controller.UpdateProject);
 router.delete('/deleteproject/:id', Auth.Authentication, Auth.Authorization, controller.DeleteProject);
 

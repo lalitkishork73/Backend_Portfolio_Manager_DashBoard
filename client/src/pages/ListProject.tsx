@@ -61,9 +61,7 @@ function ListProject() {
 
     function fetchProjects() {
         axios
-            .get('project/getproject', {
-                headers: { Authorization: `Bearer ${cookies._auth}` }
-            })
+            .get('project/getproject')
             .then((response) => {
                 setProjects(response.data.data);
                 console.log(response.data.data);

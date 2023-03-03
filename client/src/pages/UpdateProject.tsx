@@ -50,9 +50,7 @@ const UpdateProject = () => {
     useEffect(() => {
         const fetchProjects = async () => {
             try {
-                const response = await axios.get('project/getproject', {
-                    headers: { Authorization: `Bearer ${cookies._auth}` }
-                });
+                const response = await axios.get('project/getproject');
                 // console.log(response.data.data);
                 setProjects(response.data.data);
                 // console.log(projects);
